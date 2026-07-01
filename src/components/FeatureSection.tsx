@@ -6,6 +6,8 @@ import { useMemo, useState } from "react";
 import { Breadcrumb } from "./Breadcrumb";
 import { BarChart } from "./BarChart";
 import { tokens } from "@/tokens/tokens";
+import { CostTable } from "./CostTable";
+
 
 interface DrillState {
     parentId:string | null;
@@ -51,6 +53,7 @@ export function FeatureSection() {
         {isLoading && <p style={{ color: tokens.colors.textSecondary }}>Loading cost data…</p>}
         {isError && <p style={{ color: tokens.colors.accentError }}>Couldn't load cost data. Try refreshing.</p>}
         {!isLoading && !isError && <BarChart nodes={visibleNodes} level={currentLevel} onSelect={handleSelect} />}
+        {!isLoading && !isError && <CostTable nodes={visibleNodes} />}
       </div>
     </section>
   );
