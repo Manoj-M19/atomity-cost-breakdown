@@ -7,6 +7,7 @@ import { Breadcrumb } from "./Breadcrumb";
 import { BarChart } from "./BarChart";
 import { tokens } from "@/tokens/tokens";
 import { CostTable } from "./CostTable";
+import { motion,useReducedMotion } from "framer-motion";
 
 
 interface DrillState {
@@ -17,6 +18,7 @@ interface DrillState {
 const ROOT_STATE: DrillState = { parentId:null,trail:[{ id:null,label:"All Clusters"}]};
 
 export function FeatureSection() {
+    const shouldReduceMotion = useReducedMotion();
     const { data,isLoading,isError} = useCostHierarchy();
     const [drill,setDrill] = useState<DrillState>(ROOT_STATE);
 
@@ -40,7 +42,14 @@ export function FeatureSection() {
 
     return (
     <section aria-labelledby="cost-breakdown-heading" className="mx-auto max-w-5xl" style={{ padding: tokens.spacing.section }}>
-      <div className="rounded-[var(--radius-card)] border p-6 sm:p-10" style={{ background: tokens.colors.bgSurface, borderColor: tokens.colors.borderSubtle }}>
+      <motion.div
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.55, ease: "easeOut" }}
+        className="rounded-[var(--radius-card)] border p-6 sm:p-10"
+        style={{ background: tokens.colors.bgSurface, borderColor: tokens.colors.borderSubtle }}
+      >
         <h2 id="cost-breakdown-heading" className="sr-only">Cloud Cost Breakdown</h2>
 
         <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
@@ -53,8 +62,8 @@ export function FeatureSection() {
         {isLoading && <p style={{ color: tokens.colors.textSecondary }}>Loading cost data…</p>}
         {isError && <p style={{ color: tokens.colors.accentError }}>Couldn't load cost data. Try refreshing.</p>}
         {!isLoading && !isError && <BarChart nodes={visibleNodes} level={currentLevel} onSelect={handleSelect} />}
-        {!isLoading && !isError && <CostTable nodes={visibleNodes} />}
-      </div>
+        {!isLoading && !isError && <CostTable    nodes={visibleNodes} />}
+      </motion.div>
     </section>
   );
 }

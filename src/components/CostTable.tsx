@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { CostNode } from "@/types/cost";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { Badge } from "./Badge";
@@ -10,6 +10,7 @@ import { tokens } from "@/tokens/tokens";
 const COLUMNS = ["Name", "CPU", "RAM", "Storage", "Network", "GPU", "Efficiency", "Total"];
 
 export function CostTable({ nodes }: { nodes: CostNode[] }) {
+  const shouldReduceMotion = useReducedMotion();
   return (
     <div className="cost-table-shell mt-8" role="table" aria-label="Cost breakdown by resource">
       <div className="cost-table-head text-xs font-semibold uppercase tracking-wide" style={{ color: tokens.colors.textMuted }} role="row">
@@ -25,11 +26,11 @@ export function CostTable({ nodes }: { nodes: CostNode[] }) {
           <motion.div
             key={node.id}
             role="row"
-            layout
-            initial={{ opacity: 0, y: 8 }}
+           layout={!shouldReduceMotion}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
-            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -8, transition: { duration: 0.15 } }}
+            transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 28 }}
             className="cost-row-grid"
           >
             <span role="cell" className="cost-cell-name font-semibold" style={{ color: tokens.colors.textPrimary }}>

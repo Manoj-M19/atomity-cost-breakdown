@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion} from "framer-motion";
 import { tokens } from "@/tokens/tokens";
 import { CostNode } from "@/types/cost";
 
@@ -13,14 +13,19 @@ interface BarProps {
 }
 
 export function Bar({ node, heightPercent, index, isInteractive, onSelect }: BarProps) {
+    const shouldReduceMotion = useReducedMotion();
   return (
     <motion.button
       type="button"
-      layout
-      initial={{ opacity: 0, scaleY: 0.4 }}
+      layout={!shouldReduceMotion}
+      initial={shouldReduceMotion ? false : { opacity: 0, scaleY: 0.4 }}
       animate={{ opacity: 1, scaleY: 1 }}
-      exit={{ opacity: 0, scaleY: 0.4, transition: { duration: 0.16 } }}
-      transition={{ type: "spring", stiffness: 280, damping: 26, delay: index * 0.04 }}
+      exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scaleY: 0.4, transition: { duration: 0.16 } }}
+      transition={
+        shouldReduceMotion
+          ? { duration: 0 }
+          : { type: "spring", stiffness: 280, damping: 26, delay: index * 0.04 }
+      }
       onClick={() => isInteractive && onSelect(node)}
       disabled={!isInteractive}
       aria-label={`${node.name}, total cost $${node.metrics.total}${isInteractive ? ", click to drill down" : ""}`}
