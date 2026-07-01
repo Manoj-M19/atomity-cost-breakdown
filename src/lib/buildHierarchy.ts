@@ -1,18 +1,18 @@
-import type { CostMetrics, CostNode } from "@/types/cost";
+import { CostMetrics, CostNode } from "@/types/cost";
 import { seededRandomRange } from "./seededRandom";
 
 interface JsonPlaceholderUser {
-    id:number;
-    company:{ name:string};
+  id: number;
+  company: { name: string };
 }
 interface JsonPlaceholderPost {
-    id:number;
-    userId:number;
-    title:string;
+  id: number;
+  userId: number;
+  title: string;
 }
 interface JsonPlaceholderComment {
-    id:number;
-    postId:number;
+  id: number;
+  postId: number;
 }
 
 function deriveMetrics(seedKey: string): CostMetrics {
@@ -23,52 +23,50 @@ function deriveMetrics(seedKey: string): CostMetrics {
   const hasGpu = seededRandomRange(`${seedKey}-hasgpu`, 0, 1) === 1;
   const gpu = hasGpu ? seededRandomRange(`${seedKey}-gpu`, 80, 850) : 0;
   const efficiency = seededRandomRange(`${seedKey}-efficiency`, 5, 70);
-
   return { cpu, ram, storage, network, gpu, efficiency, total: cpu + ram + storage + network + gpu };
 }
 
 export function buildHierarchy(
   users: JsonPlaceholderUser[],
   posts: JsonPlaceholderPost[],
-  comments: JsonPlaceholderComment[]
+  comments: JsonPlaceholderComment[],
+  timeRange: string
 ): CostNode[] {
   const nodes: CostNode[] = [];
+  const t = timeRange.replace(/\s+/g, "-").toLowerCase(); // "last-30-days"
 
   users.forEach((user) => {
-    const clusterId = `cluster-${user.id}`;
+    const clusterId = `cluster-${user.id}-${t}`;
+    const shortName = user.company.name.split(/[\s-]/)[0].replace(",", "");
     nodes.push({
       id: clusterId,
-      name: user.company.name.split(" ")[0].replace(",", ""),
+      name: shortName,
       level: "cluster",
       parentId: null,
       metrics: deriveMetrics(clusterId),
     });
 
-    posts
-      .filter((p) => p.userId === user.id)
-      .forEach((post) => {
-        const namespaceId = `namespace-${post.id}`;
-        nodes.push({
-          id: namespaceId,
-          name: `ns-${post.title.split(" ")[0]}`,
-          level: "namespace",
-          parentId: clusterId,
-          metrics: deriveMetrics(namespaceId),
-        });
-
-        comments
-          .filter((c) => c.postId === post.id)
-          .forEach((comment) => {
-            const podId = `pod-${comment.id}`;
-            nodes.push({
-              id: podId,
-              name: `pod-${comment.id.toString(36)}`,
-              level: "pod",
-              parentId: namespaceId,
-              metrics: deriveMetrics(podId),
-            });
-          });
+    posts.filter((p) => p.userId === user.id).forEach((post) => {
+      const namespaceId = `namespace-${post.id}-${t}`;
+      nodes.push({
+        id: namespaceId,
+        name: `ns-${post.title.split(" ")[0].toLowerCase()}`,
+        level: "namespace",
+        parentId: clusterId,
+        metrics: deriveMetrics(namespaceId),
       });
+
+      comments.filter((c) => c.postId === post.id).forEach((comment) => {
+        const podId = `pod-${comment.id}-${t}`;
+        nodes.push({
+          id: podId,
+          name: `pod-${comment.id.toString(36)}`,
+          level: "pod",
+          parentId: namespaceId,
+          metrics: deriveMetrics(podId),
+        });
+      });
+    });
   });
 
   return nodes;

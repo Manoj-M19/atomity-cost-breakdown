@@ -25,7 +25,7 @@ export function FeatureSection() {
   const [timeRange, setTimeRange] = useState<TimeRange>("Last 30 Days");
   const [drill, setDrill] = useState<DrillState>(ROOT_STATE);
   const shouldReduceMotion = useReducedMotion();
-  const { data, isLoading, isError } = useCostHierarchy();
+  const { data, isLoading, isError } = useCostHierarchy(timeRange);
 
   const visibleNodes = useMemo(
     () => (data ? data.filter((n) => n.parentId === drill.parentId) : []),
@@ -116,6 +116,7 @@ export function FeatureSection() {
         {!isLoading && !isError && (
           <>
             <BarChart nodes={visibleNodes} level={currentLevel} onSelect={handleSelect} />
+            <div className="my-6 border-t" style={{ borderColor: tokens.colors.borderSubtle }} />
             <CostTable nodes={visibleNodes} />
           </>
         )}

@@ -1,3 +1,46 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg-primary: #f4f6f5;
+  --color-bg-surface: #ffffff;
+  --color-border-subtle: #e4e8e6;
+
+  --color-text-primary: #0e1f17;
+  --color-text-secondary: #5b6b63;
+  --color-text-muted: #94a39c;
+
+  --color-accent-primary: #6ee7a0;
+  --color-accent-primary-strong: #34c266;
+  --color-accent-success: #1f8a4c;
+  --color-accent-error: #d93f3f;
+  --color-accent-warning: #d9a23f;
+
+  --radius-card: 1.5rem;
+  --radius-pill: 999px;
+  --radius-sm: 0.5rem;
+
+  --space-section: clamp(2rem, 5vw, 4rem);
+}
+
+[data-theme="dark"] {
+  --color-bg-primary: #0b0f0d;
+  --color-bg-surface: #141a17;
+  --color-border-subtle: #232b27;
+
+  --color-text-primary: #f2f5f3;
+  --color-text-secondary: #a8b3ad;
+  --color-text-muted: #6b756f;
+
+  --color-accent-primary: #4ade80;
+  --color-accent-primary-strong: #22c55e;
+}
+
+body {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
 .cost-table-shell {
   container-type: inline-size;
   container-name: cost-table;

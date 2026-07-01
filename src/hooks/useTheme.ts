@@ -1,21 +1,24 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
 export function useTheme() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
+  // Sync React state with whatever the inline script already set on <html>
   useEffect(() => {
-    const stored = localStorage.getItem("theme") as "light" | "dark" | null;
-    const preferred = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    const initial = stored ?? preferred;
-    setTheme(initial);
-    document.documentElement.setAttribute("data-theme", initial);
+    const current = document.documentElement.getAttribute("data-theme") as
+      | "light"
+      | "dark"
+      | null;
+    if (current) setTheme(current);
   }, []);
 
   function toggle() {
     const next = theme === "light" ? "dark" : "light";
-    setTheme(next);
     document.documentElement.setAttribute("data-theme", next);
     localStorage.setItem("theme", next);
+    setTheme(next);
   }
 
   return { theme, toggle };
