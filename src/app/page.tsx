@@ -1,25 +1,23 @@
-import { tokens } from "@/tokens/tokens";
+"use client";
+
+import { useCostHierarchy } from "@/hooks/useCostHierarchy";
 
 export default function Home() {
+  const { data, isLoading, isError } = useCostHierarchy();
+
+  if (isLoading) return <main className="p-8">Loading hierarchy…</main>;
+  if (isError) return <main className="p-8">Failed to load.</main>;
+
+  const clusters = data!.filter((n) => n.level === "cluster");
+  const namespaces = data!.filter((n) => n.level === "namespace");
+  const pods = data!.filter((n) => n.level === "pod");
+
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <div
-        className="p-8 rounded-[var(--radius-card)] border"
-        style={{
-          background: tokens.colors.bgSurface,
-          borderColor: tokens.colors.borderSubtle,
-        }}
-      >
-        <h1
-          className="text-2xl font-bold"
-          style={{ color: tokens.colors.textPrimary }}
-        >
-          Tokens wired up ✓
-        </h1>
-        <p style={{ color: tokens.colors.textSecondary }}>
-          If this card has a white surface and the dashed border shows, we're good.
-        </p>
-      </div>
+    <main className="p-8 space-y-2">
+      <p>{clusters.length} clusters</p>
+      <p>{namespaces.length} namespaces</p>
+      <p>{pods.length} pods</p>
+      <pre className="text-xs">{JSON.stringify(clusters[0], null, 2)}</pre>
     </main>
   );
 }
